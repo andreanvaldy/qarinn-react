@@ -6,12 +6,12 @@ import NewPage from './pages/NewPage'; // Impor halaman baru
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<App />} />         {/* Halaman utama */}
-        <Route path="/newpage" element={<NewPage />} /> {/* Halaman baru */}
-      </Routes>
-    </BrowserRouter>
+    <BrowserRouter basename="/qarinn-react">
+  <Routes>
+    <Route path="/" element={<App />} />
+    <Route path="/newpage" element={<NewPage />} />
+  </Routes>
+</BrowserRouter>
   </React.StrictMode>
 );
 
