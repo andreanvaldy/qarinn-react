@@ -1,118 +1,127 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import './App.css';
 
-const animesData = [
-  {
-    mal_id: 21,
-    title: 'One Piece',
-    year: 1999,
-    image: 'https://cdn.myanimelist.net/images/anime/6/73245.jpg',
-    score: 8.71,
-    synopsis:
-      'Barely surviving in a barrel after passing through a terrible whirlpool at sea, carefree Monkey D. Luffy ends up aboard a ship under attack by fearsome pirates. Despite being a naive-looking teenager, he is not to be underestimated. Unmatched in battle, Luffy is a pirate himself who resolutely pursues the coveted One Piece treasure and the King of the Pirates title that comes with it.',
-  },
-  {
-    mal_id: 20,
-    title: 'Naruto',
-    year: 2002,
-    image: 'https://cdn.myanimelist.net/images/anime/13/17405.jpg',
-    score: 8.71,
-    synopsis:
-      "Moments prior to Naruto Uzumaki's birth, a huge demon known as the Kyuubi, the Nine-Tailed Fox, attacked Konohagakure, the Hidden Leaf Village, and wreaked havoc. In order to put an end to the Kyuubi's rampage, the leader of the village, the Fourth Hokage, sacrificed his life and sealed the monstrous beast inside the newborn Naruto.",
-  },
-  {
-    mal_id: 269,
-    title: 'Bleach',
-    year: 2004,
-    image: 'https://cdn.myanimelist.net/images/anime/3/40451.jpg',
-    score: 8.71,
-    synopsis:
-      "Ichigo Kurosaki is an ordinary high schooler—until his family is attacked by a Hollow, a corrupt spirit that seeks to devour human souls. It is then that he meets a Soul Reaper named Rukia Kuchiki, who gets injured while protecting Ichigo's family from the assailant.",
-  },
-  {
-    mal_id: 31964,
-    title: 'Boku no Hero Academia',
-    year: 2016,
-    image: 'https://cdn.myanimelist.net/images/anime/10/78745.jpg',
-    score: 8.71,
-    synopsis:
-      'The appearance of "quirks", newly discovered super powers, has been steadily increasing over the years, with 80 percent of humanity possessing various abilities from manipulation of elements to shapeshifting. This leaves the remainder of the world completely powerless, and Izuku Midoriya is one such individual.',
-  },
-];
+export default function RegistrationForm() {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+  });
+  const [errors, setErrors] = useState({});
 
-export default function App() {
-  const [query, setQuery] = useState('');
-  const [animes, setAnimes] = useState(animesData);
-  const [selectedAnime, setSelectedAnime] = useState(animes[0]);
-  const [isOpen1, setIsOpen1] = useState(true);
-  const [isOpen2, setIsOpen2] = useState(true);
+  const validateForm = () => {
+    const newErrors = {};
 
-  function handleSelectedAnime(id) {
-    const newAnime = animes.filter((anime) => anime.mal_id === id);
-    setSelectedAnime(newAnime[0]);
-  }
+    // Validasi Nama
+    if (!formData.name.trim()) {
+      newErrors.name = 'Nama tidak boleh kosong.';
+    } else if (formData.name.length > 20) {
+      newErrors.name = 'Nama tidak boleh lebih dari 20 karakter.';
+    }
+
+    // Validasi Email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email tidak boleh kosong.';
+    } else if (!emailRegex.test(formData.email)) {
+      newErrors.email = 'Format email tidak valid.';
+    }
+
+    // Validasi Kata Sandi
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/;
+    if (!formData.password) {
+      newErrors.password = 'Kata sandi tidak boleh kosong.';
+    } else if (!passwordRegex.test(formData.password)) {
+      newErrors.password =
+        'Kata sandi harus minimal 8 karakter, mengandung huruf besar, huruf kecil, angka, dan simbol.';
+    }
+
+    // Validasi Konfirmasi Kata Sandi
+    if (!formData.confirmPassword) {
+      newErrors.confirmPassword = 'Konfirmasi kata sandi tidak boleh kosong.';
+    } else if (formData.confirmPassword !== formData.password) {
+      newErrors.confirmPassword = 'Konfirmasi kata sandi harus sama dengan kata sandi.';
+    }
+
+    setErrors(newErrors);
+
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (validateForm()) {
+      alert('Pendaftaran berhasil!\n' + `Nama: ${formData.name}\nEmail: ${formData.email}`);
+      setFormData({ name: '', email: '', password: '', confirmPassword: '' });
+      setErrors({});
+    }
+  };
 
   return (
-    <>
-      <nav className="nav-bar">
-        <div className="logo">
-          <span role="img">🍥</span>
-          <h1>WeeBoo</h1>
-          <span role="img">🍥</span>
+    <div className="form-container">
+      <h1>Form Registrasi</h1>
+      <form onSubmit={handleSubmit} noValidate>
+        <div className="form-group">
+          <label htmlFor="name">Nama</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            placeholder="Masukkan nama"
+          />
+          {errors.name && <p className="error">{errors.name}</p>}
         </div>
-        <div className="search-container">
-          <input className="search" type="text" placeholder="Search anime..." value={query} onChange={(e) => setQuery(e.target.value)} />
-          <p className="search-results">
-            Found <strong>4</strong> results
-          </p>
-        </div>
-      </nav>
 
-      <main className="main">
-        <div className="box">
-          <button className="btn-toggle" onClick={() => setIsOpen1((open) => !open)}>
-            {isOpen1 ? '–' : '+'}
-          </button>
-          {isOpen1 && (
-            <ul className="list list-anime">
-              {animes?.map((anime) => (
-                <li key={anime.mal_id} onClick={() => handleSelectedAnime(anime.mal_id)}>
-                  <img src={anime.image} alt={`${anime.title} cover`} />
-                  <h3>{anime.title}</h3>
-                  <div>
-                    <p>
-                      <span>{anime.year}</span>
-                    </p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
+        <div className="form-group">
+          <label htmlFor="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            placeholder="Masukkan email"
+          />
+          {errors.email && <p className="error">{errors.email}</p>}
         </div>
-        <div className="box">
-          <button className="btn-toggle" onClick={() => setIsOpen2((open) => !open)}>
-            {isOpen2 ? '–' : '+'}
-          </button>
-          {isOpen2 && (
-            <div className="details">
-              <header>
-                <img src={selectedAnime.image} alt={`${selectedAnime.title} cover`} />
-                <div className="details-overview">
-                  <h2>{selectedAnime.title}</h2>
-                  <p>
-                    {selectedAnime.year} &bull; {selectedAnime.score}
-                  </p>
-                </div>
-              </header>
-              <section>
-                <p>
-                  <em>{selectedAnime.synopsis}</em>
-                </p>
-              </section>
-            </div>
-          )}
+
+        <div className="form-group">
+          <label htmlFor="password">Kata Sandi</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            placeholder="Masukkan kata sandi"
+          />
+          {errors.password && <p className="error">{errors.password}</p>}
         </div>
-      </main>
-    </>
+
+        <div className="form-group">
+          <label htmlFor="confirmPassword">Konfirmasi Kata Sandi</label>
+          <input
+            type="password"
+            id="confirmPassword"
+            name="confirmPassword"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            placeholder="Masukkan kembali kata sandi"
+          />
+          {errors.confirmPassword && <p className="error">{errors.confirmPassword}</p>}
+        </div>
+
+        <button type="submit" className="submit-btn">Daftar</button>
+      </form>
+    </div>
   );
 }
